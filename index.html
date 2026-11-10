@@ -352,7 +352,7 @@ async function analyze(it){
   const add = (s,t,d) => R.push({s,t,d});
   const resOk = Math.min(W,H) >= 720;
   add(resOk?"ok":"bad", `Resolução ${W}x${H}`, resOk?"":"Abaixo de 720. Exporte em 720p ou mais.");
-  add(D>60?"ok":"bad", `Duração ${fmt(D)}`, D>60?"":"O vídeo tem que passar de 1 minuto.");
+  add(D>60?"ok":"bad", `Duração ${fmt(D)}`, D>60?"":"O vídeo tem que passar de 1 minuto. Dica: se a narração acabar antes, coloque um vídeo no final (de preferência um Twixtor do personagem) até bater 1:01.");
   if(fps==null) add("warn","FPS não deu pra medir","Confira no export se está em 30 fps.");
   else add(Math.abs(fps-30)<=1.5?"ok":"bad", `~${Math.round(fps)} fps`, Math.abs(fps-30)<=1.5?"":"Deveria ser 30 fps.");
   if(/:/.test(it.file.name)) add("bad","Nome do arquivo com dois-pontos","Troque por hífen.");
