@@ -26,6 +26,8 @@ select{width:auto;padding:6px 10px}
 .file{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:16px;margin-top:16px}
 .top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center}
 .name{font-weight:600;word-break:break-all}
+button.x{background:transparent;border:1px solid var(--line);color:var(--muted);padding:3px 9px;border-radius:8px;font-size:13px}
+button.x:hover{color:var(--bad);border-color:var(--bad)}
 .badge{padding:5px 12px;border-radius:999px;font-size:13px;font-weight:700}
 .badge.ok{background:#3ecf8e22;color:var(--ok)}
 .badge.warn{background:#f5b84b22;color:var(--warn)}
@@ -128,11 +130,16 @@ function addFiles(list){
     if(!(f.type.startsWith("video") || /\.(mp4|mov|webm|mkv)$/i.test(f.name))) continue;
     const it = { file:f, lang:guessLang(f.name), res:null };
     it.el = document.createElement("div"); it.el.className = "file";
-    it.el.innerHTML = `<div class="top"><span class="name"></span><span style="display:flex;gap:10px;align-items:center"><select><option>EN</option><option>DE</option><option>FR</option></select><span class="badge run">na fila</span></span></div><div class="body"></div>`;
+    it.el.innerHTML = `<div class="top"><span class="name"></span><span style="display:flex;gap:10px;align-items:center"><select><option>EN</option><option>DE</option><option>FR</option></select><span class="badge run">na fila</span><button class="x" title="Fechar este vídeo">✕</button></span></div><div class="body"></div>`;
     it.el.querySelector(".name").textContent = f.name;
     const sel = it.el.querySelector("select"); sel.value = it.lang;
     sel.onchange = () => { it.lang = sel.value; cross(); report(); };
     $("files").appendChild(it.el);
+    it.el.querySelector(".x").onclick = () => {
+      it.closed = true; it.el.remove();
+      const k = items.indexOf(it); if(k >= 0) items.splice(k, 1);
+      cross(); report();
+    };
     items.push(it);
     queue = queue.then(() => analyze(it)).then(() => { cross(); report(); }).catch(e => { console.log(e); });
   }
@@ -328,6 +335,7 @@ async function audioInfo(file, cutTimes, D){
 
 // ------------------------------------------------------------------ análise de um arquivo
 async function analyze(it){
+  if(it.closed) return;
   const body = it.el.querySelector(".body"), badge = it.el.querySelector(".badge");
   badge.className = "badge run"; badge.textContent = "analisando";
   body.innerHTML = `<div class="live"><video muted playsinline></video><div style="flex:1"><div class="note st">abrindo vídeo...</div><div class="pbar"><div></div></div></div></div>`;
@@ -398,6 +406,7 @@ async function analyze(it){
     add(au.tailOk?"ok":"bad", au.tailOk?"Som até o fim":"Som acaba antes do fim", au.tailOk?"":"A música da predefinição tem que ir até o fim do vídeo.");
   } else add("warn","Não consegui ler o áudio","Cliques e música não foram conferidos.");
 
+  if(it.closed) return;
   it.res = { W,H,D,fps,takes,cuts,list:R };
   render(it);
 }
