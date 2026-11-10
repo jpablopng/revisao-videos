@@ -47,6 +47,7 @@ ul.res li:last-child{border:0}
 .tk .lb{position:absolute;left:0;right:0;bottom:0;font-size:10px;background:#000b;padding:1px 4px;display:flex;justify-content:space-between}
 .tk.bad{border-color:var(--bad)}.tk.warn{border-color:var(--warn)}
 .tk .fl{position:absolute;top:2px;right:3px;font-size:11px}
+.tk .kd{position:absolute;top:2px;left:3px;font-size:9px;font-weight:700;background:#000b;padding:0 4px;border-radius:4px}
 .legend{font-size:12px;color:var(--muted);margin-top:8px}
 details{margin-top:6px}
 summary{cursor:pointer;color:var(--muted);font-size:14px}
@@ -253,6 +254,41 @@ function ham(a,b){ let n=0; for(let i=0;i<a.length;i++) if(a[i]!==b[i]) n++; ret
 function minHam(A,B){ let m=99; for(const a of A) for(const b of B) m=Math.min(m,ham(a,b)); return m; }
 function flatness(g){ let s=0,s2=0; for(const x of g){s+=x;s2+=x*x;} const m=s/g.length; return Math.sqrt(Math.max(0,s2/g.length-m*m)); }
 
+// imagem com movimento embutido: diferença entre quadros pequena e uniforme.
+// vídeo de anime: quadros parados misturados com saltos, ou muito movimento.
+function gray64(f){
+  if(f.g64) return f.g64;
+  const d = f.thumb.data, g = new Float32Array(T*T);
+  for(let i=0;i<T*T;i++) g[i] = 0.299*d[i*4]+0.587*d[i*4+1]+0.114*d[i*4+2];
+  return f.g64 = g;
+}
+// diferença que sobra depois de compensar pan e zoom (busca de deslocamento e escala)
+function residuo(A, B){
+  const samp = (x,y) => { const x0=Math.floor(x), y0=Math.floor(y), fx=x-x0, fy=y-y0; const i=y0*T+x0;
+    return (B[i]*(1-fx)+B[i+1]*fx)*(1-fy) + (B[i+T]*(1-fx)+B[i+T+1]*fx)*fy; };
+  let best = 1e9, raw = 0, n = 0;
+  for(let y=12;y<52;y++) for(let x=12;x<52;x++){ raw += Math.abs(A[y*T+x]-B[y*T+x]); n++; }
+  for(const s of [0.985,1,1.015]) for(let dy=-3;dy<=3;dy+=0.5) for(let dx=-3;dx<=3;dx+=0.5){
+    let sum = 0;
+    for(let y=12;y<52;y++){ const by=(y-32)*s+32+dy; for(let x=12;x<52;x++){ sum += Math.abs(A[y*T+x]-samp((x-32)*s+32+dx, by)); } if(sum >= best) break; }
+    if(sum < best) best = sum;
+  }
+  return { raw: raw/n, comp: best/n };
+}
+function tipoTake(fr){
+  if(fr.length < 4) return null;
+  const d = [];
+  for(let i=1;i<fr.length;i++){ const a=fr[i-1].g, b=fr[i].g; let s=0; for(let k=0;k<a.length;k++) s+=Math.abs(a[k]-b[k]); d.push(s/a.length); }
+  const parados = d.filter(x=>x<0.3).length/d.length;
+  if(parados >= 0.9) return "parado";
+  if(parados > 0.15) return "vid";               // quadros repetidos = animação de anime
+  const idx = []; for(let i=1;i<fr.length;i++) if(d[i-1] >= 0.3) idx.push(i);
+  const passo = Math.max(1, Math.floor(idx.length/8)), ratios = [];
+  for(let k=0;k<idx.length;k+=passo){ const i=idx[k]; const r = residuo(gray64(fr[i-1]), gray64(fr[i])); if(r.raw > 0.5) ratios.push(r.comp/r.raw); }
+  if(!ratios.length) return "parado";
+  return median(ratios) > 0.45 ? "vid" : "img";
+}
+
 function buildTakes(F, cuts, D){
   const bounds = [0, ...cuts.map(c=>c.t), D], takes = [];
   for(let k=0;k<bounds.length-1;k++){
@@ -263,7 +299,7 @@ function buildTakes(F, cuts, D){
     const pick = p => fr[Math.min(fr.length-1, Math.floor(p*fr.length))];
     const hs = [0.25,0.5,0.75].map(p => pick(p)).filter(f => flatness(f.g) > 10).map(f => dhash(f.g));
     const barsN = fr.filter(f => f.bars).length;
-    takes.push({ a, b, d:b-a, mid:pick(0.5), hashes:hs, bars: barsN/fr.length > 0.5 ? (fr.find(f=>f.bars).bars) : null, flash:false });
+    takes.push({ a, b, d:b-a, mid:pick(0.5), hashes:hs, bars: barsN/fr.length > 0.5 ? (fr.find(f=>f.bars).bars) : null, flash:false, kind: tipoTake(inner) });
   }
   return takes;
 }
@@ -314,18 +350,26 @@ async function analyze(it){
 
   // ---- regras
   const add = (s,t,d) => R.push({s,t,d});
-  add(W===720&&H===720?"ok":"bad", `Resolução ${W}x${H}`, W===720&&H===720?"":"Deveria ser 720x720 (export 720p, proporção 1:1).");
-  add(D>=60.95?"ok":"bad", `Duração ${fmt(D)}`, D>=60.95?"":"Mínimo 1:01. Se a narração acaba antes, complete com Twixtor até 1:01.");
+  const resOk = Math.min(W,H) >= 720;
+  add(resOk?"ok":"bad", `Resolução ${W}x${H}`, resOk?"":"Abaixo de 720. Exporte em 720p ou mais.");
+  add(D>60?"ok":"bad", `Duração ${fmt(D)}`, D>60?"":"O vídeo tem que passar de 1 minuto.");
   if(fps==null) add("warn","FPS não deu pra medir","Confira no export se está em 30 fps.");
   else add(Math.abs(fps-30)<=1.5?"ok":"bad", `~${Math.round(fps)} fps`, Math.abs(fps-30)<=1.5?"":"Deveria ser 30 fps.");
   if(/:/.test(it.file.name)) add("bad","Nome do arquivo com dois-pontos","Troque por hífen.");
 
   const ds = takes.map(t=>t.d), avgd = ds.reduce((a,b)=>a+b,0)/Math.max(1,ds.length);
-  const longos = takes.filter(t=>t.d>4.5), mais3 = takes.filter(t=>t.d>3 && t.d<=4.5), curtos = takes.filter(t=>t.d<1);
+  const curtos = takes.filter(t=>t.d<1);
   add(avgd>=1 && avgd<=3?"ok":"warn", `${takes.length} takes, média de ${avgd.toFixed(1)} s`, avgd>=1&&avgd<=3?"Padrão: maioria entre 1 e 3 s.":"Média fora do padrão (1 a 3 s, perto de 2 s).");
-  if(longos.length) add("bad", `${longos.length} take(s) acima de 4,5 s`, "Em "+longos.map(t=>fmt(t.a)+" ("+t.d.toFixed(1)+" s)").join(", ")+". Divida em 2 takes. Obs.: se for uma cena de vídeo com muita ação, a página pode ter visto um corte a mais ou a menos.");
-  else add("ok","Nenhum take acima de 4,5 s","");
-  if(mais3.length > Math.max(2, takes.length*0.2)) add("warn", `${mais3.length} takes entre 3 e 4,5 s`, "Só vale quando a frase inteira fala da mesma coisa. Confira: "+mais3.map(t=>fmt(t.a)).join(", "));
+  const nImg = takes.filter(t=>t.kind==="img").length, nVid = takes.filter(t=>t.kind==="vid").length, nTot = nImg+nVid;
+  if(nTot >= 4){
+    const pImg = nImg/nTot;
+    const s = pImg < 0.3 ? "warn" : pImg > 0.85 ? "warn" : "ok";
+    const dica = pImg < 0.3 ? "Pouca imagem. O padrão é uma mistura, perto de 60% imagem e 40% vídeo." : pImg > 0.85 ? "Pouco vídeo. O padrão é uma mistura, perto de 60% imagem e 40% vídeo (mais vídeo quando o tema é um episódio)." : "Mistura boa (padrão perto de 60/40). Contagem aproximada.";
+    add(s, `Mídias: ${nImg} imagens e ${nVid} vídeos (${Math.round(pImg*100)}% imagem)`, dica);
+  }
+  const parados = takes.filter(t=>t.kind==="parado");
+  if(parados.length) add("warn", `${parados.length} take(s) parado(s), sem movimento`, "Em "+parados.map(t=>fmt(t.a)).join(", ")+". Toda imagem precisa de movimento (lados, zoom ou em Y). Se for vídeo, a cena está congelada.");
+  else add("ok","Nenhum take parado","");
   if(curtos.length > takes.length*0.35) add("warn", `${curtos.length} takes abaixo de 1 s`, "Abaixo de 1 s só em lista de nomes, ações em sequência ou frase de impacto.");
 
   const comBarra = takes.filter(t=>t.bars);
@@ -340,22 +384,16 @@ async function analyze(it){
   if(dups.length) add("warn", `Possível mídia repetida (${dups.length})`, dups.slice(0,8).map(([i,j])=>fmt(takes[i].a)+" e "+fmt(takes[j].a)).join("; ")+". Confira se é a mesma imagem/plano.");
   else add("ok","Nenhuma mídia repetida encontrada","");
 
-  // ciclo Aproximar, Aproximar, Brilho 2: o 3º, 6º, 9º... corte deve ter flash
-  if(cuts.length >= 3){
-    let hit=0, exp=0, extra=0;
-    cuts.forEach((c,i) => { const deve = (i+1)%3===0; if(deve){ exp++; if(c.flash) hit++; } else if(c.flash) extra++; });
-    const okPct = exp ? hit/exp : 1;
-    const s = okPct>=0.75 && extra<=Math.max(1,cuts.length*0.1) ? "ok" : "warn";
-    add(s, `Brilho 2 no ciclo: ${hit} de ${exp} no lugar certo`, s==="ok" ? "Ciclo Aproximar, Aproximar, Brilho 2 parece certo." : `Esperado flash a cada 3ª transição. ${extra} flash(es) fora do lugar. Pode ser falso alarme se a cena tiver explosão ou brilho próprio.`);
+  // transições: precisa ter pelo menos uma de brilho e pelo menos uma de outro tipo
+  if(cuts.length >= 2){
+    const nFlash = cuts.filter(c=>c.flash).length, nOutra = cuts.length - nFlash;
+    const s = nFlash>=1 && nOutra>=1 ? "ok" : "warn";
+    add(s, `Transições: ${nFlash} de brilho e ${nOutra} de outro tipo`, s==="ok" ? "" : (nFlash ? "Só tem transição de brilho. Use também outro tipo de transição." : "Nenhuma transição de brilho encontrada. Use pelo menos uma."));
   }
 
   if(au.ok){
-    const fl = cuts.map((c,i)=>({c,i})).filter(o=>o.c.flash);
-    const semClique = fl.filter(o=>!au.clicks[o.i]);
-    if(fl.length) add(semClique.length <= fl.length*0.25 ? "ok":"warn", `Clique em ${fl.length-semClique.length} de ${fl.length} Brilho 2`, semClique.length? "Sem clique perto de: "+semClique.map(o=>fmt(o.c.t)).join(", ")+" (detecção aproximada).":"");
     const naoFlash = cuts.map((c,i)=>({c,i})).filter(o=>!o.c.flash && au.clicks[o.i]);
-    if(naoFlash.length > Math.max(2, cuts.length*0.2)) add("warn", `Possível clique em transições Aproximar (${naoFlash.length})`, "O clique é só no Brilho 2. Detecção aproximada.");
-    if(au.startClick) add("warn","Possível clique no começo do vídeo","Não pode ter clique no início.");
+    if(naoFlash.length > Math.max(2, cuts.length*0.2)) add("warn", `Possível clique em transições sem brilho (${naoFlash.length})`, "Perto de: "+naoFlash.slice(0,10).map(o=>fmt(o.c.t)).join(", ")+". O clique só pode ser na transição de brilho. Detecção aproximada.");
     if(au.endClick) add("warn","Possível clique no fim do vídeo","Não pode ter clique no fim.");
     add(au.tailOk?"ok":"bad", au.tailOk?"Som até o fim":"Som acaba antes do fim", au.tailOk?"":"A música da predefinição tem que ir até o fim do vídeo.");
   } else add("warn","Não consegui ler o áudio","Cliques e música não foram conferidos.");
@@ -377,15 +415,16 @@ function render(it){
   const icon = {ok:"✓",warn:"!",bad:"✕"};
   let h = `<ul class="res">`;
   for(const x of r.list) h += `<li><span class="ic ${x.s}">${icon[x.s]}</span><span>${esc(x.t)}${x.d?`<span class="det">${esc(x.d)}</span>`:""}</span></li>`;
-  h += `</ul><details><summary>Ver os ${r.takes.length} takes detectados</summary><div class="strip"></div><div class="legend">Vermelho: acima de 4,5 s ou faixa preta. Amarelo: possível repetição. ⚡ = flash (Brilho 2) na transição de entrada.</div></details>`;
+  h += `</ul><details><summary>Ver os ${r.takes.length} takes detectados</summary><div class="strip"></div><div class="legend">Vermelho: faixa preta. Amarelo: possível repetição ou take parado. ⚡ = transição de brilho na entrada do take. IMG/VID = imagem ou vídeo (aproximado).</div></details>`;
   body.innerHTML = h;
   const strip = body.querySelector(".strip");
   r.takes.forEach((t,i) => {
-    const d = document.createElement("div"); d.className = "tk"+((t.d>4.5||t.bars)?" bad":(t.dup?" warn":""));
+    const d = document.createElement("div"); d.className = "tk"+((t.bars)?" bad":((t.dup||t.kind==="parado")?" warn":""));
     const c = document.createElement("canvas"); c.width=T; c.height=T; c.getContext("2d").putImageData(t.mid.thumb,0,0);
     d.appendChild(c);
     const prevFlash = i>0 && r.cuts[i-1] && r.cuts[i-1].flash;
-    d.insertAdjacentHTML("beforeend", `${prevFlash?'<span class="fl">⚡</span>':''}<div class="lb"><span>${fmt(t.a)}</span><span>${t.d.toFixed(1)}s</span></div>`);
+    const kd = t.kind==="img" ? "IMG" : t.kind==="vid" ? "VID" : t.kind==="parado" ? "PARADO" : "";
+    d.insertAdjacentHTML("beforeend", `${kd?`<span class="kd">${kd}</span>`:''}${prevFlash?'<span class="fl">⚡</span>':''}<div class="lb"><span>${fmt(t.a)}</span><span>${t.d.toFixed(1)}s</span></div>`);
     strip.appendChild(d);
   });
 }
