@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Revisão de Edição: Shorts de Anime 3 Idiomas</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f1115;--card:#171a21;--card2:#1e222b;--line:#2a2f3a;--txt:#e8eaf0;--muted:#9aa1b0;--ok:#3ecf8e;--warn:#f5b84b;--bad:#ff5d6c;--acc:#7c8cff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;font-size:15px;line-height:1.5}
+.wrap{max-width:1000px;margin:0 auto;padding:28px 18px 80px}
+h1{font-size:26px;margin:0 0 4px}
+h2{font-size:18px;margin:0 0 6px}
+p.sub{color:var(--muted);margin:0 0 22px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:20px}
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.row>label{flex:1;min-width:200px}
+label.f span{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+input[type=text],select{width:100%;background:var(--card2);border:1px solid var(--line);color:var(--txt);border-radius:9px;padding:10px 12px;font:inherit}
+select{width:auto;padding:6px 10px}
+.drop{display:block;border:2px dashed var(--line);border-radius:12px;padding:34px;text-align:center;color:var(--muted);cursor:pointer;transition:.15s}
+.drop.over,.drop:hover{border-color:var(--acc);color:var(--txt)}
+.drop input{display:none}
+.drop b{font-size:17px;color:var(--txt)}
+.file{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:16px;margin-top:16px}
+.top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center}
+.name{font-weight:600;word-break:break-all}
+.badge{padding:5px 12px;border-radius:999px;font-size:13px;font-weight:700}
+.badge.ok{background:#3ecf8e22;color:var(--ok)}
+.badge.warn{background:#f5b84b22;color:var(--warn)}
+.badge.bad{background:#ff5d6c22;color:var(--bad)}
+.badge.run{background:#7c8cff22;color:var(--acc)}
+.live{display:flex;gap:14px;align-items:center;margin-top:12px}
+.live video{width:110px;height:110px;object-fit:contain;background:#000;border-radius:8px}
+.pbar{flex:1;height:8px;background:#12151b;border-radius:99px;overflow:hidden}
+.pbar div{height:100%;width:0;background:var(--acc);transition:width .2s}
+ul.res{list-style:none;padding:0;margin:14px 0 6px}
+ul.res li{display:flex;gap:10px;padding:6px 0;border-bottom:1px solid var(--line)}
+ul.res li:last-child{border:0}
+.ic{width:20px;flex-shrink:0;text-align:center;font-weight:700}
+.ic.ok{color:var(--ok)}.ic.warn{color:var(--warn)}.ic.bad{color:var(--bad)}
+.det{display:block;font-size:13px;color:var(--muted)}
+.strip{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:6px;margin-top:12px}
+.tk{position:relative;border:2px solid transparent;border-radius:7px;overflow:hidden;background:#000}
+.tk canvas{display:block;width:100%;height:auto}
+.tk .lb{position:absolute;left:0;right:0;bottom:0;font-size:10px;background:#000b;padding:1px 4px;display:flex;justify-content:space-between}
+.tk.bad{border-color:var(--bad)}.tk.warn{border-color:var(--warn)}
+.tk .fl{position:absolute;top:2px;right:3px;font-size:11px}
+.legend{font-size:12px;color:var(--muted);margin-top:8px}
+details{margin-top:6px}
+summary{cursor:pointer;color:var(--muted);font-size:14px}
+details ul{color:var(--muted);font-size:14px;margin:8px 0 0}
+button{background:var(--acc);color:#fff;border:0;border-radius:9px;padding:10px 16px;font:inherit;font-weight:600;cursor:pointer}
+button.sec{background:var(--card2);border:1px solid var(--line);color:var(--txt)}
+textarea{width:100%;min-height:220px;background:var(--card2);color:var(--txt);border:1px solid var(--line);border-radius:9px;padding:12px;font:13px/1.5 ui-monospace,monospace;margin-top:12px}
+.msg{font-size:13px;margin-left:10px;color:var(--ok)}
+.note{font-size:13px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Revisão automática de edição</h1>
+  <p class="sub">Shorts de anime 1:1 em 3 idiomas. Suba os vídeos exportados e a página confere o padrão sozinha. Nada sai do seu computador: tudo roda no navegador.</p>
+
+  <div class="card">
+    <div class="row">
+      <label class="f"><span>Seu nome</span><input type="text" id="editor" placeholder="Ex.: Laura"></label>
+      <label class="f"><span>Tema do vídeo</span><input type="text" id="video" placeholder="Ex.: Rinnegan Sasuke"></label>
+    </div>
+  </div>
+
+  <div class="card">
+    <label class="drop" id="drop">
+      <input type="file" id="fileIn" accept="video/*" multiple>
+      <b>Arraste aqui os vídeos (EN, DE e FR)</b><br>ou clique pra escolher. Pode subir 1, 2 ou os 3.
+    </label>
+    <p class="note" style="margin:10px 0 0">Cada vídeo leva uns 20 a 40 segundos. Deixe esta aba aberta e na frente enquanto analisa. O idioma é lido pelo nome do arquivo; se errar, troque na caixinha.</p>
+    <div id="files"></div>
+    <div id="cross"></div>
+  </div>
+
+  <div class="card">
+    <h2>Relatório pro Pablo</h2>
+    <p class="note">Depois da análise, copie e mande junto com os vídeos.</p>
+    <button id="copy">Copiar relatório</button><span class="msg" id="copied"></span>
+    <textarea id="out" readonly placeholder="O relatório aparece aqui depois da análise"></textarea>
+    <details>
+      <summary>O que a checagem automática NÃO consegue ver (confira você mesmo)</summary>
+      <ul>
+        <li>Se cada take mostra o que a frase está falando.</li>
+        <li>Legendas no centro (X 0, Y 0) e narração/legendas sem alteração.</li>
+        <li>Movimento certo das imagens (horizontal para os lados, quadrada zoom, vertical em Y) e o personagem dentro do quadro.</li>
+        <li>Imagem borrada ou com balão, mangá, marca d'água grande, cartela NO CC.</li>
+        <li>Música, overlay e filtro da predefinição layout skill.</li>
+        <li>Trecho final depois da narração feito só com Twixtor.</li>
+      </ul>
+    </details>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const store = { get(k){try{return localStorage.getItem(k)}catch(e){return null}}, set(k,v){try{localStorage.setItem(k,v)}catch(e){}} };
+["editor","video"].forEach(id => { const v = store.get("rev_"+id); if(v) $(id).value = v; $(id).addEventListener("input", e => { store.set("rev_"+id, e.target.value); report(); }); });
+
+const items = [];   // {file, lang, el, res}
+let queue = Promise.resolve();
+
+const drop = $("drop");
+["dragenter","dragover"].forEach(e => drop.addEventListener(e, ev => { ev.preventDefault(); drop.classList.add("over"); }));
+["dragleave","drop"].forEach(e => drop.addEventListener(e, ev => { ev.preventDefault(); drop.classList.remove("over"); }));
+drop.addEventListener("drop", ev => addFiles(ev.dataTransfer.files));
+$("fileIn").addEventListener("change", ev => { addFiles(ev.target.files); ev.target.value = ""; });
+
+function guessLang(n){
+  n = n.toLowerCase();
+  if(/(^|[^a-z])(de|alem|alemao|german|deutsch|ger)([^a-z]|$)/.test(n)) return "DE";
+  if(/(^|[^a-z])(fr|fran|frances|french|fra)([^a-z]|$)/.test(n)) return "FR";
+  return "EN";
+}
+function fmt(s){ const m = Math.floor(s/60); return m+":"+(s-m*60).toFixed(1).padStart(4,"0"); }
+function median(a){ if(!a.length) return 0; const b=[...a].sort((x,y)=>x-y); return b[Math.floor(b.length/2)]; }
+
+function addFiles(list){
+  for(const f of list){
+    if(!(f.type.startsWith("video") || /\.(mp4|mov|webm|mkv)$/i.test(f.name))) continue;
+    const it = { file:f, lang:guessLang(f.name), res:null };
+    it.el = document.createElement("div"); it.el.className = "file";
+    it.el.innerHTML = `<div class="top"><span class="name"></span><span style="display:flex;gap:10px;align-items:center"><select><option>EN</option><option>DE</option><option>FR</option></select><span class="badge run">na fila</span></span></div><div class="body"></div>`;
+    it.el.querySelector(".name").textContent = f.name;
+    const sel = it.el.querySelector("select"); sel.value = it.lang;
+    sel.onchange = () => { it.lang = sel.value; cross(); report(); };
+    $("files").appendChild(it.el);
+    items.push(it);
+    queue = queue.then(() => analyze(it)).then(() => { cross(); report(); }).catch(e => { console.log(e); });
+  }
+}
+
+// ------------------------------------------------------------------ captura de quadros
+const G = 32, T = 64; // grade de análise e miniatura
+function grabber(){
+  const cg = document.createElement("canvas"); cg.width = G; cg.height = G;
+  const ct = document.createElement("canvas"); ct.width = T; ct.height = T;
+  const xg = cg.getContext("2d",{willReadFrequently:true}), xt = ct.getContext("2d",{willReadFrequently:true});
+  return v => {
+    xg.drawImage(v,0,0,G,G); xt.drawImage(v,0,0,T,T);
+    const d = xg.getImageData(0,0,G,G).data, g = new Uint8Array(G*G);
+    let s = 0;
+    for(let i=0;i<G*G;i++){ const l = (0.299*d[i*4]+0.587*d[i*4+1]+0.114*d[i*4+2])|0; g[i]=l; s+=l; }
+    const td = xt.getImageData(0,0,T,T);
+    return { g, lum: s/(G*G), bars: barras(td.data), thumb: td };
+  };
+}
+function barras(d){
+  const L = (x,y) => { const i=(y*T+x)*4; return 0.299*d[i]+0.587*d[i+1]+0.114*d[i+2]; };
+  const band = (x0,y0,x1,y1) => { let s=0,s2=0,n=0; for(let y=y0;y<y1;y++)for(let x=x0;x<x1;x++){const l=L(x,y);s+=l;s2+=l*l;n++;} const m=s/n; return {m,sd:Math.sqrt(Math.max(0,s2/n-m*m))}; };
+  const b = 4, mid = band(16,16,48,48);
+  if(mid.m < 28) return null;
+  const black = f => f.m < 14 && f.sd < 6;
+  if(black(band(0,0,T,b)) && black(band(0,T-b,T,T))) return "cima/baixo";
+  if(black(band(0,0,b,T)) && black(band(T-b,0,T,T))) return "laterais";
+  return null;
+}
+function seek(v,t){ return new Promise(r => { const f=()=>{v.removeEventListener("seeked",f);r();}; v.addEventListener("seeked",f); v.currentTime=t; }); }
+
+async function capture(v, D, prog){
+  const grab = grabber(), frames = [];
+  if("requestVideoFrameCallback" in HTMLVideoElement.prototype){
+    await seek(v, 0);
+    await new Promise(async resolve => {
+      let done = false, lastT = -1, stall = null;
+      const finish = () => { if(done) return; done = true; clearInterval(stall); v.pause(); resolve(); };
+      const cb = (now, meta) => {
+        if(done) return;
+        const t = meta.mediaTime;
+        if(t > lastT){ frames.push(Object.assign({t}, grab(v))); lastT = t; prog(t/D); }
+        if(t >= D - 0.06) return finish();
+        v.requestVideoFrameCallback(cb);
+      };
+      v.addEventListener("ended", finish, {once:true});
+      let lastLen = 0, idle = 0;
+      stall = setInterval(() => { if(frames.length === lastLen){ if(++idle > 8) finish(); else v.play().catch(()=>{}); } else { idle = 0; lastLen = frames.length; } }, 1000);
+      v.playbackRate = 3;
+      v.requestVideoFrameCallback(cb);
+      try{ await v.play(); }catch(e){ finish(); }
+    });
+  }
+  if(frames.length < D*6){ // reserva: passo fixo por seek
+    frames.length = 0;
+    const step = 1/12;
+    for(let t=0; t<D-0.03; t+=step){ await seek(v,t); frames.push(Object.assign({t}, grab(v))); prog(t/D); }
+  }
+  return frames;
+}
+
+function medirFps(v){
+  return new Promise(async res => {
+    if(!("requestVideoFrameCallback" in HTMLVideoElement.prototype)) return res(null);
+    let n=0,t0=null,last=null,done=false;
+    const fim=()=>{ if(done)return; done=true; v.pause(); if(t0==null||last-t0<0.3||n<5) return res(null); res((n-1)/(last-t0)); };
+    const cb=(now,m)=>{ if(done)return; if(t0==null)t0=m.mediaTime; last=m.mediaTime; n++; if(last-t0>=1.2) return fim(); v.requestVideoFrameCallback(cb); };
+    try{ await seek(v, Math.min(2, v.duration/3)); v.playbackRate=1; v.requestVideoFrameCallback(cb); await v.play(); }catch(e){ return res(null); }
+    setTimeout(fim, 3500);
+  });
+}
+
+// ------------------------------------------------------------------ cortes e takes
+function hist(g){ const h = new Float32Array(16); for(const x of g) h[x>>4]++; return h; }
+function detectCuts(F){
+  const sc = [0];
+  for(let i=1;i<F.length;i++){
+    const a=F[i-1].g, b=F[i].g; let pd=0; for(let k=0;k<a.length;k++) pd+=Math.abs(a[k]-b[k]); pd/=a.length;
+    const ha=F[i-1].h||(F[i-1].h=hist(a)), hb=F[i].h||(F[i].h=hist(b)); let hd=0; for(let k=0;k<16;k++) hd+=Math.abs(ha[k]-hb[k]); hd=hd/(2*a.length)*100;
+    sc.push(pd + hd);
+  }
+  const thr = Math.max(24, median(sc)*4);
+  let cuts = [];
+  for(let i=1;i<F.length;i++){
+    if(sc[i] < thr) continue;
+    let peak = true;
+    for(let j=i-1;j>=0 && F[i].t-F[j].t<=0.12;j--) if(sc[j]>sc[i]) peak=false;
+    for(let j=i+1;j<F.length && F[j].t-F[i].t<=0.12;j++) if(sc[j]>=sc[i]) peak=false;
+    if(peak) cuts.push({t:(F[i-1].t+F[i].t)/2, s:sc[i], i});
+  }
+  // junta picos muito próximos (transição de 0,2 s gera 2 picos)
+  const merged = [];
+  for(const c of cuts){
+    const p = merged[merged.length-1];
+    if(p && c.t - p.t < 0.28){ if(c.s > p.s) merged[merged.length-1] = c; }
+    else merged.push(c);
+  }
+  return merged.filter(c => c.t > 0.2);
+}
+function flashAt(F, t){
+  let mx = 0; const pre = [], pos = [];
+  for(const f of F){
+    const d = f.t - t;
+    if(Math.abs(d) <= 0.2) mx = Math.max(mx, f.lum);
+    else if(d < 0 && d >= -0.7) pre.push(f.lum);
+    else if(d > 0 && d <= 0.7) pos.push(f.lum);
+  }
+  const b = Math.max(median(pre), median(pos));
+  return (mx - b > 30) || (mx > 210 && mx - b > 18);
+}
+function dhash(g){
+  const out = []; // 8x8 a partir da grade 32x32 (média de blocos 4x4, 9 colunas)
+  const cell = (cx,cy) => { let s=0; const x0=Math.floor(cx*32/9), x1=Math.floor((cx+1)*32/9), y0=cy*4; for(let y=y0;y<y0+4;y++)for(let x=x0;x<x1;x++) s+=g[y*32+x]; return s/((x1-x0)*4); };
+  for(let y=0;y<8;y++){ const row=[]; for(let x=0;x<9;x++) row.push(cell(x,y)); for(let x=0;x<8;x++) out.push(row[x] < row[x+1] ? 1 : 0); }
+  return out;
+}
+function ham(a,b){ let n=0; for(let i=0;i<a.length;i++) if(a[i]!==b[i]) n++; return n; }
+function minHam(A,B){ let m=99; for(const a of A) for(const b of B) m=Math.min(m,ham(a,b)); return m; }
+function flatness(g){ let s=0,s2=0; for(const x of g){s+=x;s2+=x*x;} const m=s/g.length; return Math.sqrt(Math.max(0,s2/g.length-m*m)); }
+
+function buildTakes(F, cuts, D){
+  const bounds = [0, ...cuts.map(c=>c.t), D], takes = [];
+  for(let k=0;k<bounds.length-1;k++){
+    const a=bounds[k], b=bounds[k+1];
+    const inner = F.filter(f => f.t > a+0.12 && f.t < b-0.12);
+    const fr = inner.length ? inner : F.filter(f => f.t >= a && f.t < b);
+    if(!fr.length) continue;
+    const pick = p => fr[Math.min(fr.length-1, Math.floor(p*fr.length))];
+    const hs = [0.25,0.5,0.75].map(p => pick(p)).filter(f => flatness(f.g) > 10).map(f => dhash(f.g));
+    const barsN = fr.filter(f => f.bars).length;
+    takes.push({ a, b, d:b-a, mid:pick(0.5), hashes:hs, bars: barsN/fr.length > 0.5 ? (fr.find(f=>f.bars).bars) : null, flash:false });
+  }
+  return takes;
+}
+
+// ------------------------------------------------------------------ áudio
+async function audioInfo(file, cutTimes, D){
+  try{
+    const Ctx = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+    const ctx = new Ctx(1, 44100, 44100);
+    const buf = await ctx.decodeAudioData(await file.arrayBuffer());
+    const sr = buf.sampleRate, ch = buf.getChannelData(0);
+    const win = Math.round(sr*0.005), n = Math.floor(ch.length/win);
+    const hp = new Float32Array(n), rms = new Float32Array(n);
+    for(let i=0;i<n;i++){ let e=0,r=0; for(let j=i*win+1;j<(i+1)*win;j++){ const d=ch[j]-ch[j-1]; e+=d*d; r+=ch[j]*ch[j]; } hp[i]=e; rms[i]=r; }
+    const idx = t => Math.max(0, Math.min(n-1, Math.round(t*sr/win)));
+    const spike = (t0,t1,c0,c1) => { let mx=0; for(let i=idx(t0);i<=idx(t1);i++) mx=Math.max(mx,hp[i]); const ctxv=[]; for(let i=idx(c0);i<=idx(c1);i++) ctxv.push(hp[i]); const m=median(ctxv)||1e-9; return mx/m; };
+    const clicks = cutTimes.map(t => spike(t-0.25, t+0.05, t-0.8, t+0.5) > 12);
+    let total=0; for(const r of rms) total+=r; const avg = total/n;
+    let tail=0, tn=0; for(let i=idx(D-1.0);i<n;i++){ tail+=rms[i]; tn++; }
+    const tailOk = tn ? (tail/tn) > avg*0.03 : true;
+    const startClick = spike(0, 0.25, 0, 1.2) > 25;
+    const endClick = spike(D-0.3, D, D-1.5, D) > 25;
+    return { ok:true, clicks, tailOk, startClick, endClick };
+  }catch(e){ return { ok:false }; }
+}
+
+// ------------------------------------------------------------------ análise de um arquivo
+async function analyze(it){
+  const body = it.el.querySelector(".body"), badge = it.el.querySelector(".badge");
+  badge.className = "badge run"; badge.textContent = "analisando";
+  body.innerHTML = `<div class="live"><video muted playsinline></video><div style="flex:1"><div class="note st">abrindo vídeo...</div><div class="pbar"><div></div></div></div></div>`;
+  const v = body.querySelector("video"), st = body.querySelector(".st"), bar = body.querySelector(".pbar div");
+  const url = URL.createObjectURL(it.file); v.src = url;
+  try{ await new Promise((r,j)=>{ v.onloadedmetadata=r; v.onerror=j; }); }
+  catch(e){ badge.className="badge bad"; badge.textContent="não abriu"; st.textContent="O navegador não conseguiu abrir esse arquivo. Exporte em MP4 (H.264)."; it.res={fatal:true,list:[{s:"bad",t:"arquivo não abriu no navegador"}]}; return; }
+
+  const W=v.videoWidth, H=v.videoHeight, D=v.duration, R = [];
+  st.textContent = "medindo fps...";
+  const fps = await medirFps(v);
+  st.textContent = "assistindo o vídeo (3x mais rápido)...";
+  const F = await capture(v, D, p => bar.style.width = Math.min(100,p*100)+"%");
+  st.textContent = "analisando áudio...";
+  const cuts = detectCuts(F);
+  const takes = buildTakes(F, cuts, D);
+  cuts.forEach((c,i) => { c.flash = flashAt(F, c.t); if(takes[i]) takes[i].flash = c.flash; });
+  const au = await audioInfo(it.file, cuts.map(c=>c.t), D);
+  URL.revokeObjectURL(url);
+
+  // ---- regras
+  const add = (s,t,d) => R.push({s,t,d});
+  add(W===720&&H===720?"ok":"bad", `Resolução ${W}x${H}`, W===720&&H===720?"":"Deveria ser 720x720 (export 720p, proporção 1:1).");
+  add(D>=60.95?"ok":"bad", `Duração ${fmt(D)}`, D>=60.95?"":"Mínimo 1:01. Se a narração acaba antes, complete com Twixtor até 1:01.");
+  if(fps==null) add("warn","FPS não deu pra medir","Confira no export se está em 30 fps.");
+  else add(Math.abs(fps-30)<=1.5?"ok":"bad", `~${Math.round(fps)} fps`, Math.abs(fps-30)<=1.5?"":"Deveria ser 30 fps.");
+  if(/:/.test(it.file.name)) add("bad","Nome do arquivo com dois-pontos","Troque por hífen.");
+
+  const ds = takes.map(t=>t.d), avgd = ds.reduce((a,b)=>a+b,0)/Math.max(1,ds.length);
+  const longos = takes.filter(t=>t.d>4.5), mais3 = takes.filter(t=>t.d>3 && t.d<=4.5), curtos = takes.filter(t=>t.d<1);
+  add(avgd>=1 && avgd<=3?"ok":"warn", `${takes.length} takes, média de ${avgd.toFixed(1)} s`, avgd>=1&&avgd<=3?"Padrão: maioria entre 1 e 3 s.":"Média fora do padrão (1 a 3 s, perto de 2 s).");
+  if(longos.length) add("bad", `${longos.length} take(s) acima de 4,5 s`, "Em "+longos.map(t=>fmt(t.a)+" ("+t.d.toFixed(1)+" s)").join(", ")+". Divida em 2 takes. Obs.: se for uma cena de vídeo com muita ação, a página pode ter visto um corte a mais ou a menos.");
+  else add("ok","Nenhum take acima de 4,5 s","");
+  if(mais3.length > Math.max(2, takes.length*0.2)) add("warn", `${mais3.length} takes entre 3 e 4,5 s`, "Só vale quando a frase inteira fala da mesma coisa. Confira: "+mais3.map(t=>fmt(t.a)).join(", "));
+  if(curtos.length > takes.length*0.35) add("warn", `${curtos.length} takes abaixo de 1 s`, "Abaixo de 1 s só em lista de nomes, ações em sequência ou frase de impacto.");
+
+  const comBarra = takes.filter(t=>t.bars);
+  if(comBarra.length) add("bad", `Faixa preta em ${comBarra.length} take(s)`, comBarra.map(t=>fmt(t.a)+" ("+t.bars+")").join(", ")+". A mídia tem que preencher o quadrado.");
+  else add("ok","Sem faixa preta","");
+
+  const dups = [];
+  for(let i=0;i<takes.length;i++) for(let j=i+2;j<takes.length;j++){
+    if(!takes[i].hashes.length || !takes[j].hashes.length) continue;
+    if(minHam(takes[i].hashes, takes[j].hashes) <= 5){ dups.push([i,j]); takes[i].dup = takes[j].dup = true; }
+  }
+  if(dups.length) add("warn", `Possível mídia repetida (${dups.length})`, dups.slice(0,8).map(([i,j])=>fmt(takes[i].a)+" e "+fmt(takes[j].a)).join("; ")+". Confira se é a mesma imagem/plano.");
+  else add("ok","Nenhuma mídia repetida encontrada","");
+
+  // ciclo Aproximar, Aproximar, Brilho 2: o 3º, 6º, 9º... corte deve ter flash
+  if(cuts.length >= 3){
+    let hit=0, exp=0, extra=0;
+    cuts.forEach((c,i) => { const deve = (i+1)%3===0; if(deve){ exp++; if(c.flash) hit++; } else if(c.flash) extra++; });
+    const okPct = exp ? hit/exp : 1;
+    const s = okPct>=0.75 && extra<=Math.max(1,cuts.length*0.1) ? "ok" : "warn";
+    add(s, `Brilho 2 no ciclo: ${hit} de ${exp} no lugar certo`, s==="ok" ? "Ciclo Aproximar, Aproximar, Brilho 2 parece certo." : `Esperado flash a cada 3ª transição. ${extra} flash(es) fora do lugar. Pode ser falso alarme se a cena tiver explosão ou brilho próprio.`);
+  }
+
+  if(au.ok){
+    const fl = cuts.map((c,i)=>({c,i})).filter(o=>o.c.flash);
+    const semClique = fl.filter(o=>!au.clicks[o.i]);
+    if(fl.length) add(semClique.length <= fl.length*0.25 ? "ok":"warn", `Clique em ${fl.length-semClique.length} de ${fl.length} Brilho 2`, semClique.length? "Sem clique perto de: "+semClique.map(o=>fmt(o.c.t)).join(", ")+" (detecção aproximada).":"");
+    const naoFlash = cuts.map((c,i)=>({c,i})).filter(o=>!o.c.flash && au.clicks[o.i]);
+    if(naoFlash.length > Math.max(2, cuts.length*0.2)) add("warn", `Possível clique em transições Aproximar (${naoFlash.length})`, "O clique é só no Brilho 2. Detecção aproximada.");
+    if(au.startClick) add("warn","Possível clique no começo do vídeo","Não pode ter clique no início.");
+    if(au.endClick) add("warn","Possível clique no fim do vídeo","Não pode ter clique no fim.");
+    add(au.tailOk?"ok":"bad", au.tailOk?"Som até o fim":"Som acaba antes do fim", au.tailOk?"":"A música da predefinição tem que ir até o fim do vídeo.");
+  } else add("warn","Não consegui ler o áudio","Cliques e música não foram conferidos.");
+
+  it.res = { W,H,D,fps,takes,cuts,list:R };
+  render(it);
+}
+
+function verdict(list){
+  const b = list.filter(r=>r.s==="bad").length, w = list.filter(r=>r.s==="warn").length;
+  if(b) return ["bad", `Precisa corrigir (${b})`];
+  if(w) return ["warn", `Conferir avisos (${w})`];
+  return ["ok","Aprovado"];
+}
+
+function render(it){
+  const body = it.el.querySelector(".body"), badge = it.el.querySelector(".badge"), r = it.res;
+  const [cls, txt] = verdict(r.list); badge.className = "badge "+cls; badge.textContent = txt;
+  const icon = {ok:"✓",warn:"!",bad:"✕"};
+  let h = `<ul class="res">`;
+  for(const x of r.list) h += `<li><span class="ic ${x.s}">${icon[x.s]}</span><span>${esc(x.t)}${x.d?`<span class="det">${esc(x.d)}</span>`:""}</span></li>`;
+  h += `</ul><details><summary>Ver os ${r.takes.length} takes detectados</summary><div class="strip"></div><div class="legend">Vermelho: acima de 4,5 s ou faixa preta. Amarelo: possível repetição. ⚡ = flash (Brilho 2) na transição de entrada.</div></details>`;
+  body.innerHTML = h;
+  const strip = body.querySelector(".strip");
+  r.takes.forEach((t,i) => {
+    const d = document.createElement("div"); d.className = "tk"+((t.d>4.5||t.bars)?" bad":(t.dup?" warn":""));
+    const c = document.createElement("canvas"); c.width=T; c.height=T; c.getContext("2d").putImageData(t.mid.thumb,0,0);
+    d.appendChild(c);
+    const prevFlash = i>0 && r.cuts[i-1] && r.cuts[i-1].flash;
+    d.insertAdjacentHTML("beforeend", `${prevFlash?'<span class="fl">⚡</span>':''}<div class="lb"><span>${fmt(t.a)}</span><span>${t.d.toFixed(1)}s</span></div>`);
+    strip.appendChild(d);
+  });
+}
+function esc(s){ return String(s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+// ------------------------------------------------------------------ comparação entre idiomas
+let crossList = [];
+function cross(){
+  crossList = [];
+  const box = $("cross"); box.innerHTML = "";
+  const get = l => items.find(i=>i.lang===l && i.res && i.res.takes);
+  const en = get("EN"), de = get("DE"), fr = get("FR");
+  const add = (s,t,d) => crossList.push({s,t,d});
+  const first20 = (x) => x.res.takes.filter(t=>t.a<20 && t.hashes.length);
+  const after20 = (x) => x.res.takes.filter(t=>t.a>=20.5 && t.hashes.length);
+  const sameFirst = (A,B) => { let n=0; for(const a of first20(A)) if(first20(B).some(b=>minHam(a.hashes,b.hashes)<=5)) n++; return n; };
+  const follow = (X) => {
+    const E = after20(en), L = after20(X); if(!L.length) return null;
+    let match=0, ordered=0, lastIdx=-1;
+    for(const t of L){
+      let best=-1, bh=99; E.forEach((e,k)=>{ const h=minHam(t.hashes,e.hashes); if(h<bh){bh=h;best=k;} });
+      if(bh<=8){ match++; if(best>=lastIdx){ ordered++; lastIdx=best; } }
+    }
+    return { pct: match/L.length, ord: match? ordered/match : 1 };
+  };
+  if(en){
+    for(const [X,nm] of [[de,"Alemão"],[fr,"Francês"]]){
+      if(!X) continue;
+      const n = sameFirst(X, en);
+      add(n<=1?"ok":"bad", `${nm}: primeiros 20 s ${n<=1?"diferentes":"com "+n+" mídia(s) igual(is)"} da principal`, n<=1?"":"Nos primeiros 20 s DE usa as alternativas a e FR as b.");
+      const f = follow(X);
+      if(f){
+        const s = f.pct>=0.6 && f.ord>=0.8 ? "ok" : "warn";
+        add(s, `${nm}: depois dos 20 s, ${Math.round(f.pct*100)}% das mídias batem com a principal`, s==="ok"?"Mesmas mídias na mesma ordem.":"Depois dos 20 s tem que ser as mesmas mídias da principal, na mesma ordem (pode ter takes a menos).");
+      }
+    }
+  }
+  if(de && fr){
+    const n = sameFirst(de, fr);
+    add(n<=1?"ok":"warn", `Alemão x francês: primeiros 20 s ${n<=1?"diferentes":"com "+n+" mídia(s) igual(is)"}`, n<=1?"":"DE usa as alternativas a e FR as b.");
+  }
+  if(!crossList.length) return;
+  const icon = {ok:"✓",warn:"!",bad:"✕"};
+  const [cls,txt] = verdict(crossList);
+  box.innerHTML = `<div class="file"><div class="top"><span class="name">Comparação entre idiomas</span><span class="badge ${cls}">${txt}</span></div><ul class="res">${crossList.map(x=>`<li><span class="ic ${x.s}">${icon[x.s]}</span><span>${esc(x.t)}${x.d?`<span class="det">${esc(x.d)}</span>`:""}</span></li>`).join("")}</ul></div>`;
+}
+
+// ------------------------------------------------------------------ relatório
+function report(){
+  const done = items.filter(i=>i.res);
+  if(!done.length){ $("out").value=""; return; }
+  const sym = {ok:"OK",warn:"AVISO",bad:"ERRO"};
+  let t = `REVISÃO AUTOMÁTICA: ${$("video").value.trim()||"(sem tema)"}\nEditor: ${$("editor").value.trim()||"(sem nome)"}\n`;
+  for(const it of done){
+    const [, v] = verdict(it.res.list);
+    t += `\n[${it.lang}] ${it.file.name}: ${v.toUpperCase()}\n`;
+    for(const x of it.res.list) if(x.s!=="ok") t += `  ${sym[x.s]}: ${x.t}${x.d?" | "+x.d:""}\n`;
+  }
+  if(crossList.length){
+    t += `\nCOMPARAÇÃO ENTRE IDIOMAS\n`;
+    for(const x of crossList) t += `  ${sym[x.s]}: ${x.t}${x.d&&x.s!=="ok"?" | "+x.d:""}\n`;
+  }
+  t += `\nObs.: checagem automática não vê se o take combina com a frase, legenda no centro, qualidade das imagens nem a música da predefinição.\n`;
+  $("out").value = t;
+}
+$("copy").onclick = async () => {
+  report(); const t = $("out").value; if(!t) return;
+  try{ await navigator.clipboard.writeText(t); $("copied").textContent="copiado"; }
+  catch(e){ $("out").focus(); $("out").select(); $("copied").textContent="selecionado, aperte Ctrl+C"; }
+  setTimeout(()=>$("copied").textContent="",2500);
+};
+</script>
+</body>
+</html>
